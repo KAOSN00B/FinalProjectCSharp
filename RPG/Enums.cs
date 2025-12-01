@@ -18,4 +18,11 @@ namespace RPG
         Armour,
         Weapon     
     }
+
+    public enum EnemyType
+    {
+        Goblin,
+        Orc,
+        Troll
+    }
 }
