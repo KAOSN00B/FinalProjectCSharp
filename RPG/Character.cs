@@ -16,6 +16,10 @@ namespace RPG
         private int baseDefense;
         private int baseMaxHP;
 
+        public StatusEffect CurrentStatus { get; set; } = StatusEffect.None;
+        public int StatusTurns { get; set; } = 0;
+        public int StatusDamage { get; set; } = 0;
+
         public string Name { get { return name; } set { name = value; } }
         public int CurrentHP { get { return currentHP; } set { currentHP = value; } }
         public int BaseAttack { get { return baseAttack; } set { baseAttack = value; } }
@@ -23,12 +27,13 @@ namespace RPG
         public int BaseMaxHP { get { return baseMaxHP; } set { baseMaxHP = value; } }
 
         public Weapon? EquippedWeapon { get; protected set; }
-        public Armour? EquippedArmour { get; protected set; }
+        public Armour? EquippedArmour { get; protected set; }    
 
         // Calculated, NEVER stored
         public int Attack => BaseAttack + (EquippedWeapon?.AttackBonus ?? 0);
         public int Defense => BaseDefense + (EquippedArmour?.DefenseBonus ?? 0);
         public int MaxHP => BaseMaxHP + (EquippedArmour?.HPBonus ?? 0);
+        
 
         public Character(string name, int currentHP, int baseMaxHP, int baseAttack, int baseDefense)
         {
@@ -72,11 +77,9 @@ namespace RPG
 
         }
 
-        public virtual void UseSkill(Character target)
+        public virtual void UseSpecialAbility(Character target)
         {
-            Console.WriteLine($"{name} doesn't have this skill sorry\n");
+            Console.WriteLine($"{Name} uses their special ability!");
         }
-
-
     }
 }

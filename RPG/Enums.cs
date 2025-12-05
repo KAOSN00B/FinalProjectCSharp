@@ -6,23 +6,40 @@ using System.Threading.Tasks;
 
 namespace RPG
 {
-    public enum ClassType
-    {
-        Warrior,
-        Rogue,
-        Mage
-    }
+
     public enum ItemType 
     { 
+        None,
         Consumable, 
         Armour,
-        Weapon     
+        Weapon,
+        
     }
 
-    public enum EnemyType
+    public enum Location
     {
-        Goblin,
-        Orc,
-        Troll
+        None,
+        Town,
+        Forest,
+        Mountain,
+        BossCastle
     }
+
+    public enum CharacterClass
+    {
+        None,
+        Warrior,
+        Mage,
+        Rogue
+    }
+
+    public enum StatusEffect
+    {
+        None,
+        Poison,
+        Burn,
+        Stun,
+    }
+
+
 }

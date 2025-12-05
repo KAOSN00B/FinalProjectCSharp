@@ -16,7 +16,7 @@ namespace RPG
         private int defenseBonus;
 
         public string Name { get { return name; } private set { name = value; } }
-        public int HPBonus { get { return hpBonus; } private set { hpBonus = value; } }
+        public int HPBonus { get { return hpBonus; }  set { hpBonus = value; } }
         public int AttackBonus { get { return attackBonus; } private set { attackBonus = value; } }
         public int DefenseBonus { get { return defenseBonus; } private set { defenseBonus = value; } }
 
@@ -26,6 +26,7 @@ namespace RPG
             HPBonus = hpBonus;
             AttackBonus = attackBonus;
             DefenseBonus = defenseBonus;
+            Type = ItemType.None;
         }
 
         public abstract void DisplayInfo();

@@ -15,7 +15,7 @@ namespace RPG
 
         public override void DisplayInfo()
         {
-            Console.WriteLine($"Item:{Name} Attack Boost: {AttackBonus}");
+            Console.WriteLine($"Item:{Name} Attack Boost: {AttackBonus} || Item Type: {Type}");
         }
     }
 }

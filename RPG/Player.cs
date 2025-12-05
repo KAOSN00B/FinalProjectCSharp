@@ -24,13 +24,22 @@ namespace RPG
         private int age;
         private int level;
         private int xp;
+        private int xpRequired;
+        private int skillPoints;
+        private int maxSkillPoints;
+        private int gold;
+        public Location CurrentLocation { get; set; }
 
+        public CharacterClass Class { get; protected set; }
 
         public string HairColour { get { return hairColour; } private set { hairColour = value; } }
         public string Gender { get { return gender; } private set { gender = value; } }
         public int Age { get { return age; } private set { age = value; } }
         public int Level { get { return level; } set { level = value; } }
         public int XP { get { return xp; } set { xp = value; } }
+        public int XPRequired { get { return xpRequired; } set { xpRequired = value; } }
+        public int SkillPoints { get { return skillPoints; }  set { skillPoints = value; } }
+        public int Gold { get { return gold; } set { gold = value; } }
 
         public Player() : base() { }
 
@@ -38,10 +47,16 @@ namespace RPG
         {
             Level = 1;
             XP = 0;
+            XPRequired = 10;
             BaseMaxHP = 20;
             CurrentHP = MaxHP;
             BaseAttack = 3;
             BaseDefense = 3;
+            SkillPoints = 3;
+            Gold = 0;
+            CurrentLocation = Location.None;
+            Class = CharacterClass.None;
+
         }
 
         public static Player CharacterCreator()
@@ -83,14 +98,20 @@ namespace RPG
             Console.WriteLine("Gender?");
             player.Gender = Console.ReadLine();
 
-            Console.WriteLine("Age?");
-            player.Age = int.Parse(Console.ReadLine());
+            int age;
 
-            player.level = 1;
-            player.BaseMaxHP = 20;
-            player.CurrentHP = player.MaxHP;
-            player.BaseAttack = 3;
-            player.BaseDefense = 3;
+            while (true)
+            {
+                Console.WriteLine("Age?");
+
+                if (int.TryParse(Console.ReadLine(), out age) && age > 0)
+                {
+                    player.Age = age;
+                    break; 
+                }
+
+                Console.WriteLine("Invalid age. Please enter a valid number.\n");
+            }
 
             player.SetBaseStats();
 
@@ -100,6 +121,32 @@ namespace RPG
             return player;
         }
 
+        public void AboutPlayer()
+        {
+            Console.WriteLine($"Name: {Name} | Hair Colour: {HairColour}" +
+                $"Age | {Age}"); 
+        }
+
+        public override void DisplayStats()
+        {
+            Console.WriteLine($"Name: {Name} | Level: {Level} |Skill Points: {SkillPoints}");
+            base.DisplayStats();
+  
+            if (Inventory.Count() < 1)
+            {
+                Console.WriteLine("Inventory: (empty)");
+            }
+            else
+            {
+                Console.WriteLine("Inventory:");
+                foreach (var item in Inventory)
+                {
+                    Console.WriteLine($"- {item.Name}");
+                }
+            }
+
+        }
+
         public override void DealDamage(Character target)
         {
             if (this.CurrentHP <= 0)
@@ -107,13 +154,7 @@ namespace RPG
                 return;
             }
 
-
             base.DealDamage(target);
-
-            if (target is Enemy enemy && enemy.CurrentHP <= 0)
-            {
-                GainXP(enemy);
-            }
 
         }
 
@@ -122,11 +163,12 @@ namespace RPG
             XP += expAmount.XPReward;
 
             Console.WriteLine($"{Name} gained {expAmount.XPReward} XP. Total XP: {XP}");
-            // Check for level up
-            if (XP >= 1)
+
+            if (XP >= XPRequired)
             {
                 LevelUp();
-
+                XPRequired += 5;
+                XP = 0;
             }
         }
 
@@ -142,6 +184,7 @@ namespace RPG
 
         public void EquipWeapon(Weapon newWeapon)
         {
+            
             // Add to inventory if not already there
             if (!Inventory.Contains(newWeapon))
             {
@@ -202,6 +245,7 @@ namespace RPG
             {
                 item.DisplayInfo();
             }
+            return;
         }
 
         public void LevelUp()
@@ -218,6 +262,50 @@ namespace RPG
             CurrentHP = MaxHP;
             Console.WriteLine($"Congratulations! {Name} has reached Level {Level}!");
             DisplayStats();
+        }
+
+        public void UseItem(Player player)
+        {
+
+            var consumables = player.Inventory
+                .Where(i => i.Type == ItemType.Consumable)
+                .ToList();
+
+            if (consumables.Count == 0)
+            {
+                Console.WriteLine("You have no consumable items to use.");
+                return;
+            }
+
+            Console.WriteLine("Consumable Items:");
+            foreach (var item in consumables)
+            {
+                Console.WriteLine($"- {item.Name} (HP: +{item.HPBonus}, ATK: +{item.AttackBonus}, DEF: +{item.DefenseBonus})");
+            }
+
+            Console.WriteLine("\nEnter the name of the item you want to use:");
+            string itemName = Console.ReadLine();
+
+            // Find the item
+            var itemToUse = consumables
+                .FirstOrDefault(i => i.Name.Equals(itemName, StringComparison.OrdinalIgnoreCase));
+
+            if (itemToUse == null)
+            {
+                Console.WriteLine("Invalid item name.");
+                return;
+            }
+
+            player.CurrentHP += itemToUse.HPBonus;
+            player.BaseAttack += itemToUse.AttackBonus;
+            player.BaseDefense += itemToUse.DefenseBonus;
+
+            if (player.CurrentHP > player.MaxHP)
+                player.CurrentHP = player.MaxHP;
+
+            Console.WriteLine($"{itemToUse.Name} used!");
+
+            player.Inventory.Remove(itemToUse);
         }
 
 

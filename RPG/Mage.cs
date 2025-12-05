@@ -18,6 +18,8 @@ namespace RPG
             CurrentHP = MaxHP;
             BaseAttack = 3;
             BaseDefense = 2;
+            SkillPoints = 3;
+            Class = CharacterClass.Mage;
         }
     }
 }

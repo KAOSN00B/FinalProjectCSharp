@@ -18,6 +18,8 @@ namespace RPG
             CurrentHP = MaxHP;
             BaseAttack = 6;
             BaseDefense = 1;
+            SkillPoints = 3;
+            Class = CharacterClass.Rogue;
         }
     }
 }
