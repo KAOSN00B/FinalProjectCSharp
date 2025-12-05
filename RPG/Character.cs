@@ -55,9 +55,8 @@ namespace RPG
         {
             int damage = Attack - target.Defense;
 
-            if (target.CurrentHP <= 0)
+            if (this.CurrentHP <= 0)
             {
-                Console.WriteLine(" is already defeated.\n");
                 return;
             }
 
@@ -69,10 +68,6 @@ namespace RPG
             {
                 Console.WriteLine($"{target.name} has {target.CurrentHP} remaining\n");
 
-            }
-            else if (target.CurrentHP < 0)
-            {
-                Console.WriteLine($"{target.name} has been knockedout. {Name} wins\n");
             }
 
         }

@@ -17,7 +17,7 @@ namespace RPG
             XP = 0;
             BaseMaxHP = 20;            
             CurrentHP = MaxHP;
-            BaseAttack = 8;
+            BaseAttack = 5;
             BaseDefense = 2;
         }
     }

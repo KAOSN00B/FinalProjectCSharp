@@ -46,18 +46,33 @@ namespace RPG
 
         public static Player CharacterCreator()
         {
-            Console.WriteLine("Choose your class:");
-            Console.WriteLine("1. Warrior");
-            Console.WriteLine("2. Rogue");
-            Console.WriteLine("3. Mage");
 
-            string choice = Console.ReadLine();
+            Player? player = null;
 
-            Player player = choice switch
+            while (player == null)
             {
-                "1" => new Warrior(),
-                _ => new Player(),
-            };
+                Console.WriteLine("Choose your class:");
+                Console.WriteLine("1) Warrior");
+                Console.WriteLine("2) Rogue");
+                Console.WriteLine("3) Mage");
+                Console.Write("Enter choice: ");
+
+                string choice = Console.ReadLine();
+
+                player = choice switch
+                {
+                    "1" => new Warrior(),
+                    "2" => new Rogue(),
+                    "3" => new Mage(),
+                    _ => null
+                };
+
+                if (player == null)
+                {
+                    Console.WriteLine("Invalid choice. Please try again.\n");
+                }
+            }
+
 
             Console.WriteLine("Name?");
             player.Name = Console.ReadLine();
@@ -84,6 +99,46 @@ namespace RPG
 
             return player;
         }
+
+        public override void DealDamage(Character target)
+        {
+            if (this.CurrentHP <= 0)
+            {
+                return;
+            }
+
+
+            base.DealDamage(target);
+
+            if (target is Enemy enemy && enemy.CurrentHP <= 0)
+            {
+                GainXP(enemy);
+            }
+
+        }
+
+        public void GainXP(Enemy expAmount)
+        {
+            XP += expAmount.XPReward;
+
+            Console.WriteLine($"{Name} gained {expAmount.XPReward} XP. Total XP: {XP}");
+            // Check for level up
+            if (XP >= 1)
+            {
+                LevelUp();
+
+            }
+        }
+
+        public void LevelUP()
+        {
+            Level++;
+            BaseMaxHP += 3;
+            BaseAttack += 3;
+            BaseDefense += 3;
+
+        }
+
 
         public void EquipWeapon(Weapon newWeapon)
         {
@@ -133,6 +188,36 @@ namespace RPG
             }
             Console.WriteLine($"{Name} unequipped {EquippedArmour.Name}.");
             EquippedArmour = null;
+        }
+
+        public void DisplayInventory()
+        {
+            Console.WriteLine("Inventory:");
+            if (Inventory.Count == 0)
+            {
+                Console.WriteLine("  (empty)");
+                return;
+            }
+            foreach (var item in Inventory)
+            {
+                item.DisplayInfo();
+            }
+        }
+
+        public void LevelUp()
+        {
+            if (XP > 1)
+            {
+                XP = 0;
+                Console.WriteLine($"{Name} has leveled up!");
+            }
+            Level++;
+            BaseMaxHP += 5;
+            BaseAttack += 2;
+            BaseDefense += 2;
+            CurrentHP = MaxHP;
+            Console.WriteLine($"Congratulations! {Name} has reached Level {Level}!");
+            DisplayStats();
         }
 
 
