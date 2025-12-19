@@ -12,8 +12,7 @@ namespace RPG
         None,
         Consumable, 
         Armour,
-        Weapon,
-        
+        Weapon, 
     }
 
     public enum Location
@@ -22,7 +21,8 @@ namespace RPG
         Town,
         Forest,
         Mountain,
-        BossCastle
+        BossCastle,
+        RealmOfDarkness 
     }
 
     public enum CharacterClass
@@ -37,7 +37,7 @@ namespace RPG
     {
         None,
         Poison,
-        Burn,
+        Confused,
         Stun,
     }
 

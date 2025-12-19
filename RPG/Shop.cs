@@ -10,6 +10,7 @@ namespace RPG
 {
     public class Shop
     {
+        private bool VisitedShop = false;
         public List<Weapon> WeaponsForSale { get; private set; }
         public List<Armour> ArmourForSale { get; private set; }
 
@@ -19,34 +20,42 @@ namespace RPG
         {
             WeaponsForSale = new List<Weapon>()
         {
-            new Weapon("Iron Sword", 5),
-            new Weapon("Bronze Dagger", 4),
-            new Weapon("Oak Wand", 3)
+            new Weapon("Iron Sword", 5, 5),
+            new Weapon("Bronze Dagger", 4, 4),
+            new Weapon("Oak Wand", 3, 3)
         };
 
             ArmourForSale = new List<Armour>()
         {
-            new Armour("Leather Vest", 2, 3),
-            new Armour("Padded Jacket", 1, 3),
-            new Armour("Cloth Robe", 1, 3)
+            new Armour("Leather Vest", 2, 3, 2),
+            new Armour("Padded Jacket", 1, 3, 1),
+            new Armour("Cloth Robe", 1, 3, 1)
         };
 
             ConsumableForSale = new List<Consumable>()
             {
-                new Consumable("Health Potion", 20, 0, 0, 0),
-                new Consumable("Skill Elixir", 0, 0, 0, 1),
-                new Consumable("Defense Tonic", 0, 0, 3, 0),
-                new Consumable("Strength Tonic", 0, 3, 0, 0)
+                new Consumable("Health Potion", 20, 0, 0, 0, 4),
+                new Consumable("Skill Elixir", 0, 0, 0, 1, 4),
+                new Consumable("Defense Tonic", 0, 0, 3, 0, 3),
+                new Consumable("Strength Tonic", 0, 3, 0, 0,5)
             };
         }
 
         public void ShopMenu(Player player)
         {
-            Console.WriteLine("Welcome to the shop!");
-            Console.WriteLine("What would you like to buy?");
+            
+            if (VisitedShop == false)
+            {
+                Console.WriteLine($"Well if it isn't my old friend {player.Name}. What can i do for you?");
+            }
+            else
+            {
+                Console.WriteLine("What would you like to do?");
+            }
             Console.WriteLine("1. Weapons");
             Console.WriteLine("2. Armour");
             Console.WriteLine("3. Items");
+            Console.WriteLine("4. Sell Item");
             Console.WriteLine("0. Exit Shop");
             Console.WriteLine("(press at any time to 9 Display Inventory)");
             int choice;
@@ -67,28 +76,83 @@ namespace RPG
                 {
                     case 1:
                         WeaponDisplay(player);
+                        VisitedShop = true;
                         break;
 
                     case 2:
                         ArmourDisplay(player);
+                        VisitedShop = true;
                         break;
 
                     case 3:
                         ItemDisplay(player);
+                        VisitedShop = true;
+                        break;
+
+                    case 4:
+                        SellItem(player);
+                        VisitedShop = true;
                         break;
 
                     case 0:
-                        Console.WriteLine("Thank you for visiting the shop!");
+                        Console.WriteLine("Thank you for visiting friend. See you again!");
+                        VisitedShop = false;
                         return;  
 
                     default:
                         Console.WriteLine("Invalid choice. Please select a valid shop option.\n");
                         continue;
                 }
-
+                VisitedShop = false;
                 break; 
             }
         }
+
+        public void SellItem(Player player)
+        {
+            if (player.PlayerInventory.Count == 0)
+            {
+                Console.WriteLine("You have no items to sell.");
+                return;
+            }
+
+            Console.WriteLine("Your Inventory:");
+            int index = 1;
+
+            foreach (var item in player.PlayerInventory)
+            {
+                Console.WriteLine($"{index}) {item.Name} | Sell Price: {item.Price / 2} gold");
+                index++;
+            }
+
+            Console.WriteLine("\nEnter the number of the item you want to sell (or 0 to cancel):");
+
+            string choice = Console.ReadLine();
+
+            if (!int.TryParse(choice, out int selectedIndex) ||
+                selectedIndex < 0 || selectedIndex > player.PlayerInventory.Count)
+            {
+                Console.WriteLine("Invalid selection.");
+                return;
+            }
+
+            if (selectedIndex == 0)
+            {
+                Console.WriteLine("No worries What would you like to do?");
+                return;
+            }
+
+            var itemToSell = player.PlayerInventory[selectedIndex - 1];
+
+            int sellPrice = itemToSell.Price / 2;
+
+            player.Gold += sellPrice;
+            player.PlayerInventory.Remove(itemToSell);
+
+            Console.WriteLine($"You sold {itemToSell.Name} for {sellPrice} gold.");
+            Console.WriteLine($"You now have {player.Gold} gold.");
+        }
+
 
         public void WeaponDisplay(Player player)
         {
@@ -136,7 +200,7 @@ namespace RPG
                 else
                 {
                     Console.WriteLine($"You purchased {selected.Name}!");
-                    player.Inventory.Add(selected);
+                    player.PlayerInventory.Add(selected);
                 }
 
             }
@@ -187,7 +251,7 @@ namespace RPG
                 else
                 {
                     Console.WriteLine($"You purchased {selected.Name}!");
-                    player.Inventory.Add(selected);
+                    player.PlayerInventory.Add(selected);
                 }
             }
         }
@@ -237,7 +301,7 @@ namespace RPG
                 else
                 {
                     Console.WriteLine($"You purchased {selected.Name}!");
-                    player.Inventory.Add(selected);
+                    player.PlayerInventory.Add(selected);
                 }
             }
         }

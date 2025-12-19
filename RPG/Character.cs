@@ -41,7 +41,7 @@ namespace RPG
             CurrentHP = currentHP;
             BaseMaxHP = baseMaxHP;
             BaseAttack = baseAttack;
-            BaseDefense = BaseDefense;
+            BaseDefense = baseDefense;
         }
 
         public Character() : this("", 0, 0, 0, 0) { }  
@@ -54,28 +54,47 @@ namespace RPG
         public void Damage(int damage)
         {
             CurrentHP -= damage;
+
+            if (CurrentHP < 0)
+                CurrentHP = 0;
         }
+
 
         public virtual void DealDamage(Character target)
         {
+            if (CurrentHP <= 0)
+                return;
+
+            Console.WriteLine($"{Name} attacks {target.Name}!");
+
             int damage = Attack - target.Defense;
 
-            if (this.CurrentHP <= 0)
-            {
-                return;
-            }
+            if (damage < 0)
+                damage = 0;
 
-            if (damage < 0) damage = 0;
+            int beforeHP = target.CurrentHP;
 
             target.Damage(damage);
 
-            if (target.CurrentHP > 0)
+            if (damage == 0)
             {
-                Console.WriteLine($"{target.name} has {target.CurrentHP} remaining\n");
-
+                Console.WriteLine($"{target.Name} blocks the attack!");
+            }
+            else
+            {
+                Console.WriteLine($"{Name} deals {damage} damage to {target.Name}!");
             }
 
+            if (target.CurrentHP > 0)
+            {
+                Console.WriteLine($"{target.Name} has {target.CurrentHP} HP remaining.\n");
+            }
+            else
+            {
+                Console.WriteLine($"{target.Name} has been defeated!\n");
+            }
         }
+
 
         public virtual void UseSpecialAbility(Character target)
         {

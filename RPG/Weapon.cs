@@ -8,7 +8,7 @@ namespace RPG
 {
     public class Weapon : Inventory
     {
-        public Weapon(string name,  int attackBonus ) : base(name, 0, attackBonus, 0)
+        public Weapon(string name,  int attackBonus, int price ) : base(name, 0, attackBonus, 0, price)
         {
             Type = ItemType.Weapon;
         }

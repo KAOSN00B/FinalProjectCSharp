@@ -10,6 +10,7 @@ namespace RPG
     {
         private int xPReward;
         private int goldReward;
+        public List<Inventory> DropTable { get; set; } = new List<Inventory>();
 
         public int XPReward { get { return xPReward; }  set { xPReward = value; } }
         public int GoldReward { get { return goldReward; }  set { goldReward = value; } }
@@ -17,12 +18,10 @@ namespace RPG
         {
             XPReward = xPReward;
             GoldReward = goldReward;
+            
         }
 
         public abstract override void UseSpecialAbility(Character target);
-
-
-
 
 
     }

@@ -8,19 +8,26 @@ namespace RPG
 {
     public class KillerHornet : Enemy
     {
-        public KillerHornet() : base("Killer Hornet", 8, 12, 2, 4, 2, 6)
+        public KillerHornet() : base("Killer Hornet", 8, 8, 2, 4, 2, 6)
         {
+            DropTable.Add(new Weapon("Hornet Stinger Dagger", 2, 5));
         }
         public override void UseSpecialAbility(Character target)
         {
             Console.WriteLine($"{Name} stings {target.Name} with a venomous attack!");
 
-            int damage = (Attack + 4) - target.Defense;
+            int damage = (Attack + 2) - target.Defense;
             if (damage < 0) damage = 0;
 
             target.Damage(damage);
 
             Console.WriteLine($"{Name} deals {damage} damage!");
+
+            if (target.CurrentStatus == StatusEffect.Poison)
+            {
+                Console.WriteLine($"{target.Name} is already poisoned!");
+                return;
+            }
 
             // Apply poison
             target.CurrentStatus = StatusEffect.Poison;

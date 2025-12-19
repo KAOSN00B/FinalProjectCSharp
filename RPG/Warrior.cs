@@ -17,7 +17,7 @@ namespace RPG
             XP = 0;
             BaseMaxHP = 20;            
             CurrentHP = MaxHP;
-            BaseAttack = 1;
+            BaseAttack = 5;
             BaseDefense = 2;
             SkillPoints = 3;
             Class = CharacterClass.Warrior;
@@ -38,6 +38,22 @@ namespace RPG
             {
                 target.CurrentHP = 0; 
             }
+
+            if (target.CurrentStatus == StatusEffect.Confused)
+            {
+                Console.WriteLine($"{target.Name} is already confused!");
+                return;
+            }
+
+            if (target is TheKing)
+            {
+                Console.WriteLine("The King is immune to poison!");
+                return;
+            }
+
+            target.CurrentStatus = StatusEffect.Confused;
+            target.StatusTurns = 2;
+
             SkillPoints -= 1;
             return;
         }

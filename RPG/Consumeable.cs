@@ -10,9 +10,10 @@ namespace RPG
     {
         private int skillPointBonus;
         public int SkillPointBonus { get { return skillPointBonus; } set { skillPointBonus = value; } }
-        public Consumable(string name, int hpBonus, int attackBonus, int defenseBonus, int skillPointBonus) 
-            : base(name, hpBonus, attackBonus, defenseBonus)
+        public Consumable(string name, int hpBonus, int attackBonus, int defenseBonus, int price, int skillPointBonus ) 
+            : base(name, hpBonus, attackBonus, defenseBonus, price)
         {
+            SkillPointBonus = skillPointBonus;
             Type = ItemType.Consumable;
         }
 

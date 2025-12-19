@@ -21,5 +21,36 @@ namespace RPG
             SkillPoints = 3;
             Class = CharacterClass.Rogue;
         }
+
+        public override void UseSpecialAbility(Character target)
+        {
+            Console.WriteLine($"{Name} Throws a poisonous dagger at {target.Name}");
+
+            int damage = (Attack + 6) - target.Defense;
+            if (damage < 0) damage = 0;
+
+            target.Damage(damage);
+
+            Console.WriteLine($"{Name} deals {damage} damage!");
+
+            if (target.CurrentStatus == StatusEffect.Poison)
+            {
+                Console.WriteLine($"{target.Name} is already poisoned!");
+                return;
+            }
+
+            if (target is TheKing)
+            {
+                Console.WriteLine("The King is immune to poison!");
+                return;
+            }
+
+            // Apply poison
+            target.CurrentStatus = StatusEffect.Poison;
+            target.StatusTurns = 3;
+            target.StatusDamage = 2;
+
+            Console.WriteLine($"{target.Name} has been poisoned for 3 turns!");
+        }
     }
 }

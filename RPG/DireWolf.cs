@@ -10,12 +10,13 @@ namespace RPG
     {
         public DireWolf() : base("Dire Wolf", 10, 10, 3, 3, 3, 7)
         {
+
         }
 
         public override void UseSpecialAbility(Character target)
         {
             Console.WriteLine($"{Name} lunges at {target.Name} with a ferocious bite!");
-            int damage = (Attack + 5) - target.Defense;
+            int damage = (Attack + 2) - target.Defense;
 
             if (damage < 0) damage = 0;
 

@@ -8,7 +8,7 @@ namespace RPG
 {
     public class Armour : Inventory
     {
-        public Armour(string name, int hpBonus,  int defenseBonus) : base(name, hpBonus, 0, defenseBonus)
+        public Armour(string name, int hpBonus,  int defenseBonus, int price) : base(name, hpBonus, 0, defenseBonus, price)
         {
             Type = ItemType.Armour;
         }
