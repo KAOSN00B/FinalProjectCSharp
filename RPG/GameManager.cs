@@ -37,7 +37,7 @@ namespace RPG
             while (true)
             {
                 Console.Clear();
-                Console.WriteLine("=== Castle Of Darkness ===");
+                Console.WriteLine("=== The Dark King ===");
 
                 Console.WriteLine("Menu: ");
                 Console.WriteLine("1) New Game");
@@ -72,7 +72,6 @@ namespace RPG
                             break;
                         }
 
-
                     case "3":
                         DeleteSaveMenu();
                         break;
@@ -102,8 +101,9 @@ namespace RPG
             Console.WriteLine("1. World Selection");
             Console.WriteLine("2. SaveGame");
             Console.WriteLine("3. Load Game");
-            Console.WriteLine("4. Title Screen");
-            
+            Console.WriteLine("4. Delete Save");
+            Console.WriteLine("5. Exit Game");
+
             string choice = Console.ReadLine();
             switch (choice)
             {
@@ -122,16 +122,18 @@ namespace RPG
                             player = loaded;
                             Console.WriteLine($"Welcome back {player.Name}!");
                             WorldSelection(player);
-                            return; // exit StartGame FOREVER
+                            return;
                         }
 
                         Console.WriteLine("Load cancelled.");
                         Console.ReadLine();
                         break;
                     }
-
                 case "4":
-                    StartGame();
+                    DeleteSaveMenu();
+                    break;
+                case "5":
+                    Environment.Exit(0);
                     return;
                 default:
                     Console.WriteLine("Invalid choice. Please try again.");
@@ -154,12 +156,13 @@ namespace RPG
                 Console.WriteLine("2. Town Area");
                 Console.WriteLine("3. Mountain Area");
                 Console.WriteLine("4. Boss' Castle");
-                Console.WriteLine("5. View Inventory");
-                Console.WriteLine("6. Return to Main Menu");
+                Console.WriteLine("5. Stats & Inventory");
+                Console.WriteLine("6. Equip/Remove Gear");
+                Console.WriteLine("7. Return to Main Menu");
 
                 if (player.RealmOfDarknessKey)
                 {
-                    Console.WriteLine("7. Realm of Darkness");
+                    Console.WriteLine("8. Realm of Darkness");
                 }
 
                 Console.Write("Enter choice: ");
@@ -189,14 +192,17 @@ namespace RPG
                         break;
 
                     case "5":
+                        player.DisplayInventory();
+                        break;
+                    case "6":
                         EquipOrRemoveGear(player);
                         break;
 
-                    case "6":
+                    case "7":
                         MainMenu(player);
                         return;
 
-                    case "7":
+                    case "8":
                         if (player.RealmOfDarknessKey)
                         {
                             player.CurrentLocation = Location.RealmOfDarkness;
@@ -222,15 +228,17 @@ namespace RPG
 
             while (player.CurrentHP > 0 && enemy.CurrentHP > 0)
             {
+                Console.WriteLine("\n--- Battle Status ---");
+                player.DisplayStats();
+                enemy.DisplayStats();
+                Console.WriteLine();
 
                 if (player.CurrentHP <= 0) break;
 
                 Console.WriteLine("\n\nWhat will you do?");
                 Console.WriteLine("1. Attack");
                 Console.WriteLine("2. Use Skill");
-                Console.WriteLine("3. View Stats (Free Action)");
-                Console.WriteLine("4. View Enemy Stats (Free Action)");
-                Console.WriteLine("5. Equip Gear(Will use a turn)");
+                Console.WriteLine("3. Use Item");
                 Console.WriteLine("0. Flee");
 
                 string input = Console.ReadLine();
@@ -243,18 +251,16 @@ namespace RPG
                         player.DealDamage(enemy);
                         break;
                     case "2":
+                        if (player.SkillPoints <= 0)
+                        {
+                            Console.WriteLine("Not enough skill points!");
+                            usedTurn = false;
+                            break;
+                        }
                         player.UseSpecialAbility(enemy);
                         break;
                     case "3":
-                        player.DisplayStats();
-                        usedTurn = false;
-                        break;
-                    case "4":
-                        enemy.DisplayStats();
-                        usedTurn = false;
-                        break;
-                    case "5":
-                        EquipOrRemoveGear(player);
+                        player.UseItem();
                         break;
                     case "0":
                         Console.WriteLine("You fled the battle!");
@@ -271,7 +277,7 @@ namespace RPG
 
                 if (enemy.CurrentHP <= 0) break; // alive check before anything like poison (in case of error)
 
-                // ENEMY STATUS EFFECTS
+
                 if (enemy.CurrentStatus != StatusEffect.None)
                     ApplyStatusEffect(enemy);
 
@@ -323,9 +329,16 @@ namespace RPG
                 killerHornet
             };
 
+            var loot = new List<Inventory>()
+            {
+                 new Weapon("Bronze Dagger", 4, 4),
+                 new Consumable("Strength Tonic", 0, 3, 0, 7,0),
+            };
+
             Console.WriteLine("\n\nYou have entered the Forest Area.");
 
             int encounterChance = rng.Next(1, 101);
+            int lootChance = rng.Next(1, 101);
 
             if (encounterChance <= 50)
             {
@@ -335,10 +348,24 @@ namespace RPG
                 Console.WriteLine($"A wild {enemy.Name} appears!");
                 BattleSystem(player, enemy);
             }
+            else if (lootChance <= 50)
+            {
+                Inventory foundItem = loot[rng.Next(loot.Count)];
+                Console.WriteLine($"You found a {foundItem.Name} lying on the ground!");
+                player.PlayerInventory.Add(foundItem);
+            }
+            else if (lootChance <= 30)
+            {
+                player.Gold += 10;
+                Console.WriteLine($"You found 10 gold)");
+            }
             else
             {
                 Console.WriteLine("The forest is peaceful. No enemies encountered.");
             }
+
+
+
             Console.WriteLine("What would you like to do?");
             Console.WriteLine("Enter your choice: ");
             Console.WriteLine("1. Explore");
@@ -365,18 +392,18 @@ namespace RPG
 
         public void GameOver(Player player)
         {
-            while (true) 
+            while (true)
             {
-            Console.WriteLine("\n\nYou have been defeated!");
-            Console.WriteLine("Game Over.");
+                Console.WriteLine("\n\nYou have been defeated!");
+                Console.WriteLine("Game Over.");
 
-            Console.WriteLine("What would you like to do?");
-            Console.WriteLine("1. Spawn Back at world map");
-            Console.WriteLine("2. New Game");
-            Console.WriteLine("3. Load Game");
-            Console.WriteLine("4. Exit Game");
+                Console.WriteLine("What would you like to do?");
+                Console.WriteLine("1. Spawn Back at world map");
+                Console.WriteLine("2. New Game");
+                Console.WriteLine("3. Load Game");
+                Console.WriteLine("4. Exit Game");
 
-            string choice = Console.ReadLine();
+                string choice = Console.ReadLine();
 
                 switch (choice)
                 {
@@ -462,9 +489,16 @@ namespace RPG
                 babyBalrog
             };
 
-            Console.WriteLine("\n\nYou have entered the Forest Area.");
+            var loot = new List<Inventory>()
+            {
+                 new Weapon("Bronze Dagger", 4, 4),
+                 new Consumable("Strength Tonic", 0, 3, 0, 7,0),
+            };
+
+            Console.WriteLine("\n\nYou have entered the Mountain Area.");
 
             int encounterChance = rng.Next(1, 101);
+            int lootChance = rng.Next(1, 101);
 
             if (encounterChance <= 50)
             {
@@ -474,10 +508,24 @@ namespace RPG
                 Console.WriteLine($"A wild {enemy.Name} appears!");
                 BattleSystem(player, enemy);
             }
+            else if (lootChance <= 50)
+            {
+                Inventory foundItem = loot[rng.Next(loot.Count)];
+                Console.WriteLine($"You found a {foundItem.Name} lying on the ground!");
+                player.PlayerInventory.Add(foundItem);
+            }
+            else if (lootChance <= 30)
+            {
+                player.Gold += 10;
+                Console.WriteLine($"You found 10 gold)");
+            }
             else
             {
-                Console.WriteLine("The forest is peaceful. No enemies encountered.");
+                Console.WriteLine("The Mountains are peaceful. No enemies encountered.");
             }
+
+
+
             Console.WriteLine("What would you like to do?");
             Console.Write("Enter your choice: ");
             Console.WriteLine("1. Explore");
@@ -486,11 +534,15 @@ namespace RPG
 
             string choice = Console.ReadLine();
 
-            if (choice.ToLower() == "Explore")
+            if (choice == "1")
             {
-                ForestArea(player);
+                MountainArea(player);
             }
-            else if (choice.ToLower() == "Leave")
+            else if (choice == "2")
+            {
+                player.DisplayInventory();
+            }
+            else if (choice == "3")
             {
                 WorldSelection(player);
             }
@@ -531,10 +583,6 @@ namespace RPG
                 Console.WriteLine("The Balrog has appeared. Becareful it's massive size is as fightening as it's Power!");
                 BattleSystem(player, balrog);
 
-                Console.WriteLine("You hear a voice telling you to go to the realm of darkness to finish what you have started...");
-                Console.WriteLine("Then a gemstone appears in front of you. You pick it up and feel a surge of power flow through your body.");
-                Console.WriteLine("(The realm of darkness has been uncovered in the world map");
-
                 player.RealmOfDarknessKey = true;
                 WorldSelection(player);
             }
@@ -557,8 +605,10 @@ namespace RPG
             {
                 Console.WriteLine("Congratulations! You have defeated The King and completed the game!");
                 Console.WriteLine($"{player.Name} will be remembered for the rest of time.");
-
+                Console.WriteLine("Thank you for playing! GoodBye");
             }
+
+            Environment.Exit(0);
 
         }
 
@@ -577,12 +627,13 @@ namespace RPG
 
             while (true)
             {
+                Console.WriteLine("Your Inventory:");
                 foreach (var item in player.PlayerInventory)
                 {
                     Console.WriteLine(item.Name);
                 }
 
-                Console.WriteLine("Enter the name of the gear you want to equip:");
+                Console.WriteLine("Enter the name of the gear you want to equip: (Must be armour or weapon)");
                 string gearName = Console.ReadLine();
 
                 var gearToEquip = player.PlayerInventory.FirstOrDefault(i => i.Name.Equals(gearName, StringComparison.OrdinalIgnoreCase));
@@ -605,12 +656,14 @@ namespace RPG
                         Console.WriteLine($"{armour.Name} equipped.");
                     }
 
-                        break;
+                    break;
                 }
                 return;
 
             }
         }
+
+
 
         public void EquipOrRemoveGear(Player player)
         {
@@ -755,18 +808,35 @@ namespace RPG
         public static void SaveMenu(Player player)
         {
             Console.WriteLine("\n--- Save Game ---");
+
             for (int i = 1; i <= 3; i++)
             {
                 string path = $"save_slot_{i}.txt";
                 Console.WriteLine($"{i}) Slot {i} {(File.Exists(path) ? "(USED)" : "(EMPTY)")}");
             }
 
-            Console.Write("Choose a slot (1–3) or 0 to cancel: ");
+            Console.Write("\nChoose a slot (1–3) or 0 to cancel: ");
+
             if (!int.TryParse(Console.ReadLine(), out int choice) || choice < 0 || choice > 3)
                 return;
 
             if (choice == 0)
                 return;
+
+            string file = $"save_slot_{choice}.txt";
+
+
+            if (File.Exists(file))
+            {
+                Console.Write($"Slot {choice} already has a save. Overwrite? (y/n): ");
+                string confirm = Console.ReadLine()?.Trim().ToLower();
+
+                if (confirm != "y")
+                {
+                    Console.WriteLine("Save cancelled.");
+                    return;
+                }
+            }
 
             player.Save(choice);
             Console.WriteLine($"Game saved to Slot {choice}.");

@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using static System.Net.Mime.MediaTypeNames;
+using Newtonsoft.Json;
 
 
 namespace RPG
@@ -39,7 +40,7 @@ namespace RPG
         public int Level { get { return level; } set { level = value; } }
         public int XP { get { return xp; } set { xp = value; } }
         public int XPRequired { get { return xpRequired; } set { xpRequired = value; } }
-        public int SkillPoints { get { return skillPoints; }  set { skillPoints = value; } }
+        public int SkillPoints { get { return skillPoints; } set { skillPoints = value; } }
         public int Gold { get { return gold; } set { gold = value; } }
         public bool RealmOfDarknessKey { get { return realmOfDarknessKey; } set { realmOfDarknessKey = value; } }
 
@@ -109,7 +110,7 @@ namespace RPG
                 if (int.TryParse(Console.ReadLine(), out age) && age > 0)
                 {
                     player.Age = age;
-                    break; 
+                    break;
                 }
 
                 Console.WriteLine("Invalid age. Please enter a valid number.\n");
@@ -126,26 +127,13 @@ namespace RPG
         public void AboutPlayer()
         {
             Console.WriteLine($"Name: {Name} | Hair Colour: {HairColour}" +
-                $"Age | {Age}"); 
+                $"Age | {Age}");
         }
 
         public override void DisplayStats()
         {
-            Console.WriteLine($"Name: {Name} | Level: {Level} |Skill Points: {SkillPoints} | Class: {Class} ");
+            Console.WriteLine($"Name: {Name} | Level: {Level} |Skill Points: {SkillPoints} | Class: {Class} | Gold {Gold} | XP: {XP}/ XP Required: {XPRequired} ");
             base.DisplayStats();
-  
-            if (PlayerInventory.Count() < 1)
-            {
-                Console.WriteLine("Inventory: (empty)");
-            }
-            else
-            {
-                Console.WriteLine("Inventory:");
-                foreach (var item in PlayerInventory)
-                {
-                    Console.WriteLine($"- {item.Name}");
-                }
-            }
 
         }
 
@@ -170,7 +158,7 @@ namespace RPG
 
         public void EquipWeapon(Weapon newWeapon)
         {
-            
+
             // Add to inventory if not already there
             if (!PlayerInventory.Contains(newWeapon))
             {
@@ -221,17 +209,41 @@ namespace RPG
 
         public void DisplayInventory()
         {
-            Console.WriteLine("Inventory:");
+            DisplayStats();
+            Console.WriteLine();
+
+            Console.WriteLine("=== Inventory ===");
             if (PlayerInventory.Count == 0)
             {
                 Console.WriteLine("  (empty)");
                 return;
             }
-            foreach (var item in PlayerInventory)
+
+            // Sort by Type first, then by Name
+            var sortedInventory = PlayerInventory
+                .OrderBy(item => item.Type)   // Weapon, Armour, Consumable (enum order)
+                .ThenBy(item => item.Name)    // alphabetical within type
+               .ToList();
+
+            foreach (var item in sortedInventory)
             {
-                item.DisplayInfo();
+                switch (item.Type)
+                {
+                    case ItemType.Weapon:
+                        var weapon = item as Weapon;
+                        Console.WriteLine($"- Weapon: {weapon.Name} | Attack Bonus: {weapon.AttackBonus}");
+                        break;
+
+                    case ItemType.Armour:
+                        var armour = item as Armour;
+                        Console.WriteLine($"- Armour: {armour.Name} | HP Bonus: {armour.HPBonus} | Defense Bonus: {armour.DefenseBonus}");
+                        break;
+
+                    case ItemType.Consumable:
+                        Console.WriteLine($"- Consumable: {item.Name} | HP Bonus: {item.HPBonus} | Attack Bonus: {item.AttackBonus} | Defense Bonus: {item.DefenseBonus}");
+                        break;
+                }
             }
-            return;
         }
 
         public void LevelUp()
@@ -250,10 +262,10 @@ namespace RPG
             DisplayStats();
         }
 
-        public void UseItem(Player player)
+        public void UseItem()
         {
 
-            var consumables = player.PlayerInventory
+            var consumables = PlayerInventory
                 .Where(i => i.Type == ItemType.Consumable)
                 .ToList();
 
@@ -266,10 +278,10 @@ namespace RPG
             Console.WriteLine("Consumable Items:");
             foreach (var item in consumables)
             {
-                Console.WriteLine($"- {item.Name} (HP: +{item.HPBonus}, ATK: +{item.AttackBonus}, DEF: +{item.DefenseBonus})");
+                item.DisplayInfo();
             }
 
-            Console.WriteLine("\nEnter the name of the item you want to use:");
+            Console.WriteLine("\nEnter the name of the item you want to use: (0 to exit)");
             string itemName = Console.ReadLine();
 
             // Find the item
@@ -282,19 +294,27 @@ namespace RPG
                 return;
             }
 
-            player.CurrentHP += itemToUse.HPBonus;
-            player.BaseAttack += itemToUse.AttackBonus;
-            player.BaseDefense += itemToUse.DefenseBonus;
+            if (itemName == "0")
+            {
+                Console.WriteLine("Exiting item use.");
+                return;
+            }
 
-            if (player.CurrentHP > player.MaxHP)
-                player.CurrentHP = player.MaxHP;
+            CurrentHP += itemToUse.HPBonus;
+            BaseAttack += itemToUse.AttackBonus;
+            BaseDefense += itemToUse.DefenseBonus;
 
-            if (player.SkillPoints >= 3)
-                player.SkillPoints = 3;
+            if (CurrentHP > MaxHP)
+                CurrentHP = MaxHP;
+
+            if (SkillPoints >= 3)
+                SkillPoints = 3;
 
             Console.WriteLine($"{itemToUse.Name} used!");
 
-            player.PlayerInventory.Remove(itemToUse);
+            DisplayStats();
+
+            PlayerInventory.Remove(itemToUse);
         }
 
         public void Save(int slot)
@@ -303,7 +323,7 @@ namespace RPG
 
             var lines = new List<string>
             {
-                $"Class={GetType().Name}",
+                $"Class={Class}",
                 $"Name={Name}",
                 $"Level={Level}",
                 $"XP={XP}",
@@ -346,6 +366,7 @@ namespace RPG
 
             // 2️⃣ Restore stats (MATCHES Save)
 
+            player.Class = Enum.Parse<CharacterClass>(className);
             player.Name = data["Name"];
             player.Level = int.Parse(data["Level"]);
             player.XP = int.Parse(data["XP"]);

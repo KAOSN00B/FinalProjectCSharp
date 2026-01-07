@@ -10,26 +10,25 @@ namespace RPG
         {
             //Weapons
             new Weapon("Firebrand Greatsword", 8, 5),
-            new Weapon("Iron Sword", 5, 5),
-            new Weapon("Bronze Dagger", 4, 4),
+            new Weapon("Iron Sword", 5, 15),
+            new Weapon("Bronze Dagger", 4, 24),
             new Weapon("Small Fire Sword", 4, 5),
-            new Weapon("Oak Wand", 3, 3),
+            new Weapon("Oak Wand", 3, 7),
+            new Weapon("Hornet Stinger Dagger", 2, 5),
             
             //Armours
-            new Armour("Leather Vest", 2, 3, 2),
-            new Armour("Padded Jacket", 1, 3, 1),
-            new Armour("Cloth Robe", 1, 3, 1),
+            new Armour("Leather Vest", 2, 3, 13),
+            new Armour("Padded Jacket", 1, 3, 15),
+            new Armour("Cloth Robe", 1, 3, 8),
             new Armour("Rock ChestPlate", 2, 1, 2),
             new Armour("Balrog Hide", 10, 3, 10),
             new Armour("Light Balrog Hide", 6, 3, 6),
 
             //Consumeables
-            new Consumable("Health Potion", 20, 0, 0, 0, 4),
-            new Consumable("Skill Elixir", 0, 0, 0, 1, 4),
-            new Consumable("Defense Tonic", 0, 0, 3, 0, 3),
-            new Consumable("Strength Tonic", 0, 3, 0, 0,5),
-            new Consumable("Ember Fragment", 10, 0, 0, 0, 3),
-            new Consumable("Potion", 5, 0, 0, 0, 3),
+            new Consumable("Skill Elixir", 0, 0, 0, 10, 3),
+            new Consumable("Defense Tonic", 0, 0, 3, 8, 0),
+            new Consumable("Strength Tonic", 0, 3, 0, 7,0),
+            new Consumable("Health Potion", 20, 0, 0, 10, 0),
         };
 
         public static Inventory GetItem(string name)
